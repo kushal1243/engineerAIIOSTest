@@ -44,6 +44,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     @objc func refreshPosts() {
+        
         self.requestPosts(page:1)
         self.refreshControl.endRefreshing()
     }
@@ -64,15 +65,16 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 
                 let postsInfo : [AnyObject] = response.value(forKey: "hits") as! [AnyObject]
                 if page == 1 {
+                    self.selectedPosts.removeAllObjects()
                     self.posts = postsInfo
                 } else {
                     self.appendPosts(additionalPosts: postsInfo)
                 }
                 
                 DispatchQueue.main.async {
+                    self.title = "Selected Posts"+" \(self.selectedPosts.count)"
                     self.postsListTableView.reloadData()
                     self.refreshControl.endRefreshing()
-                   // self.activityIndicator.stopAnimating()
                 }
             } catch {
                 print("Error \(error)")
@@ -103,7 +105,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let cellSwitch = UISwitch()
         cellSwitch.tag = indexPath.row+1
         cell.accessoryView = cellSwitch
-    
+        
         return cell
     }
     
@@ -127,6 +129,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == self.posts.count-1 {
+            print("Pagination is here")
             self.requestPage += 1
             self.requestPosts(page: self.requestPage)
         }
